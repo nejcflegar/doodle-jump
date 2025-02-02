@@ -36,6 +36,7 @@ boolean atTileGround = false;
 int stZelenih = 5;
 int stModrih = 0;
 stack sklad;
+bool upI[5] = {false, false, false, false, false};
 
 
 bool CoinFlip() {
@@ -51,7 +52,7 @@ void setup(){
   }
 
   for(int i = 0; i < 5; i++){
-    ModTile[i] = new ModriTile(rand()%103, 999, CoinFlip());
+    ModTile[i] = new ModriTile(rand()%103, 999);
   }
   
   pinMode(35, INPUT_PULLUP);
@@ -99,9 +100,16 @@ void setup(){
 }
 
 bool mogoceModra(){
-  int temp = rand()%10;
+  int temp = rand()%100;
   for(int i = 0; i < score; i++){
-    if(rand()%10 == temp){
+    int temp2 = rand()%100;
+    Serial.print("FORLOOP  ||  ");
+    Serial.print(i);
+    Serial.print("    -------    ");
+    Serial.print(temp);
+    Serial.print("  ||  ");
+    Serial.println(temp2);
+    if(rand()%100 == temp){
       return true;
     }
   }
@@ -111,11 +119,11 @@ bool mogoceModra(){
 void slika(){
   background.pushImage(0,0,135,240,bg4);
   
-  for(int i = 0; i < stZelenih; i++){
+  for(int i = 0; i < 5; i++){
     zelenaTla[i].pushToSprite(&background,ZelTile[i]->x,ZelTile[i]->y,TFT_WHITE);
   }
   
-  for(int i = 0; i < stModrih; i++){
+  for(int i = 0; i < 5; i++){
     modraTla[i].pushToSprite(&background,ModTile[i]->x,ModTile[i]->y,TFT_WHITE);
   }
 
@@ -147,7 +155,7 @@ void premakniModro(){
 
 void checkTile(){
   
-  for(int i = 0; i < stZelenih; i++){
+  for(int i = 0; i < 5; i++){
     if((-32 < (ZelTile[i]->x + 16 - (x + 16))) && ((ZelTile[i]->x + 16 - (x + 16)) < 32)){
       if(-2 < (ZelTile[i]->y - (y + 32)) && (ZelTile[i]->y - (y + 32) < 4)){
         if(jumpTime > 30 ){
@@ -160,7 +168,7 @@ void checkTile(){
       }
     }
   }
-  for(int i = 0; i < stModrih; i++){
+  for(int i = 0; i < 5; i++){
     if((-32 < (ModTile[i]->x + 16 - (x + 16))) && ((ModTile[i]->x + 16 - (x + 16)) < 32)){
       if(-2 < (ModTile[i]->y - (y + 32)) && (ModTile[i]->y - (y + 32) < 4)){
         if(jumpTime > 30 ){
@@ -221,26 +229,31 @@ int poglejProstorModra(){
   return -1;
 }
 
+
 void generateTiles(){
-  for(int i = 0; i < stZelenih; i++){
-    if(ZelTile[i]->y > 240){
-      if(mogoceModra()){
-        ZelTile[i]->x = (rand() % 103);
-        ZelTile[i]->y = -30+(-1*(rand()%5));
-      }else{
-        //stZelenih--;
-        //stModrih++;
-      }
-    }
+  int i;
+  if(upI[0] == true){
+    i = 1;
+  }else{
+    i = 0;
   }
-  for(int i = 0; i < stModrih; i++){
-    if(ModTile[i]->y > 240){
-      ModTile[i]->x = (rand() % 103);
-      ModTile[i]->y = -30+(-1*(rand()%5));
-    }else{
-      ModTile[i]->y = 999;
-      stModrih--;
-      stZelenih++;
+  for(; i < stZelenih; i++){
+    if(ZelTile[i]->y > 240){
+      if(!mogoceModra()){
+        if(!upI[i]){
+          ZelTile[i]->x = (rand() % 103);
+          ZelTile[i]->y = -30+(-1*(rand()%5));
+          Serial.println("Mora biti zelena");
+        }
+      }else{
+        upI[i] = true;
+        ModTile[i]->x = (rand() % 103);
+        ModTile[i]->y = -30+(-1*(rand()%5));
+        Serial.println("Mora biti modra");
+        if(ModTile[i]->y > 240){
+          upI[i] = false;
+        }
+      }
     }
   }
 }
@@ -291,8 +304,6 @@ void smrt(){
     smrtLoop();
   }
 }
-//dadsada
-//hey heydadada
 
 void loop(){
   jumpTime++;
