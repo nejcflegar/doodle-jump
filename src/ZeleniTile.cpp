@@ -9,6 +9,7 @@ class ZeleniTile{
 class ModriTile{
     public: int x;
     public: int y;
+    public: bool levo = false;
     public: ModriTile(int x, int y){
         this->x = x;
         this->y = y;

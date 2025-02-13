@@ -98,22 +98,17 @@ void setup(){
   scr.setTextSize(3);
   scr.setTextColor(TFT_BLACK,TFT_WHITE);
 }
-
+bool yay = false;
 bool mogoceModra(){
+  yay = false;
   int temp = rand()%100;
   for(int i = 0; i < score; i++){
     int temp2 = rand()%100;
-    Serial.print("FORLOOP  ||  ");
-    Serial.print(i);
-    Serial.print("    -------    ");
-    Serial.print(temp);
-    Serial.print("  ||  ");
-    Serial.println(temp2);
-    if(rand()%100 == temp){
-      return true;
+    if(temp2 == temp){
+      yay = true;
     }
   }
-  return false;
+  return yay;
 }
 
 void slika(){
@@ -150,7 +145,23 @@ void move(boolean a){
 }
 
 void premakniModro(){
-  /////////////////////////////////////////
+  for(int i = 0; i < 5; i++){
+    if(upI[i]){
+      if(ModTile[i]->levo){
+        if(ModTile[i]->x < 0){
+          ModTile[i]->levo = false;
+          Serial.print("false");
+        }
+        ModTile[i]->x -= 2;
+      }else{
+        if(ModTile[i]->x > 109){
+          ModTile[i]->levo = true;
+          Serial.print("true");
+        }
+        ModTile[i]->x += 2;
+      }
+    }
+  }
 }
 
 void checkTile(){
@@ -216,47 +227,39 @@ void jump(){
   }
 }
 
-int poglejProstorModra(){
-  int* pomozno = new int[stZelenih];
-  int mozniX = -1;
-
-  for(int i = 0; i < stZelenih; i++){
-    pomozno[i] = ZelTile[i]->x;
-  }
-  std::sort(pomozno, pomozno + stZelenih);
-  for(int i = 0; i < stZelenih; i++){
-  }
-  return -1;
-}
-
-
-void generateTiles(){
+void generateTiles() {
   int i;
-  if(upI[0] == true){
+  if (upI[0] == true) {
     i = 1;
-  }else{
+  } else {
     i = 0;
   }
-  for(; i < stZelenih; i++){
-    if(ZelTile[i]->y > 240){
-      if(!mogoceModra()){
-        if(!upI[i]){
-          ZelTile[i]->x = (rand() % 103);
-          ZelTile[i]->y = -30+(-1*(rand()%5));
-          Serial.println("Mora biti zelena");
+
+  for (; i < stZelenih; i++) {
+    if (ZelTile[i]->y > 240) {
+      if (ModTile[i]->y > 240) {  
+          upI[i] = false;  
         }
-      }else{
-        upI[i] = true;
-        ModTile[i]->x = (rand() % 103);
-        ModTile[i]->y = -30+(-1*(rand()%5));
-        Serial.println("Mora biti modra");
-        if(ModTile[i]->y > 240){
-          upI[i] = false;
+      if(upI[i]){
+        continue;
+      }
+
+      if (!mogoceModra()) {
+        if (!upI[i]) {
+          ZelTile[i]->x = (rand() % 103);
+          ZelTile[i]->y = -10;
+        }
+      } else {
+        if (!upI[i]) {  
+          upI[i] = true;
+          ModTile[i]->x = (rand() % 103);
+          ModTile[i]->y = -10;
         }
       }
     }
   }
 }
+
 
 
 void dajDol(){
