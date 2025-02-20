@@ -17,4 +17,12 @@ class ModriTile{
 
 };
 
-//dadadadad
+class RjaviTile{
+    public: int x;
+    public: int y;
+    public: bool pada = false;
+    public: bool up = false;
+    public: RjaviTile(int x, int  y)
+    this->x = x;
+    this->y = y;
+}

@@ -6,11 +6,12 @@
 #include "bg5.h"
 #include "ZeleniTile.cpp"
 #include "stack.cpp"
-
+#include "brown.h"
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite zelenaTla[] = { TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
 TFT_eSprite modraTla[] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
+TFT_eSprite rjavaTla[] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
 TFT_eSprite background = TFT_eSprite(&tft);
 TFT_eSprite mc = TFT_eSprite(&tft);
 
@@ -24,6 +25,7 @@ int button_desno = 35;
 
 ZeleniTile* ZelTile[5];
 ModriTile* ModTile[5];
+RjaviTile* RjaTile[5];
 
 int prevAtGroundY = 9999;
 int score = 0;
@@ -101,9 +103,9 @@ void setup(){
 bool yay = false;
 bool mogoceModra(){
   yay = false;
-  int temp = rand()%100;
+  int temp = rand()%1000;
   for(int i = 0; i < score; i++){
-    int temp2 = rand()%100;
+    int temp2 = rand()%1000;
     if(temp2 == temp){
       yay = true;
     }
@@ -164,6 +166,15 @@ void premakniModro(){
   }
 }
 
+void mogoceRjava(){
+  if(rand()%100 == rand()%100){
+    genRjava();
+  }
+}
+
+void genRjava(){
+  
+}
 void checkTile(){
   
   for(int i = 0; i < 5; i++){
@@ -234,11 +245,12 @@ void generateTiles() {
   } else {
     i = 0;
   }
-
+  
   for (; i < stZelenih; i++) {
     if (ZelTile[i]->y > 240) {
-      if (ModTile[i]->y > 240) {  
-          upI[i] = false;  
+      if (ModTile[i]->y > 240){  
+          upI[i] = false; 
+          mogoceRjava(); 
         }
       if(upI[i]){
         continue;
@@ -294,6 +306,10 @@ void dajDol(){
 
 }
 
+void checkForBoost(){
+
+}
+
 void smrtLoop(){
   smrtLoop();
 }
@@ -318,6 +334,7 @@ void loop(){
     move(false);
   }
   
+  checkForBoost();
   premakniModro();
   generateTiles();
   jump();
