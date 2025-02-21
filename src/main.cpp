@@ -91,6 +91,12 @@ void setup(){
     modraTla[i].pushImage(0,0,32,6,tile[0]);
   }
 
+  for(int i = 0; i < 5; i++){
+    rjavaTla[i].createSprite(32,6);
+    rjavaTla[i].setSwapBytes(false);
+    rjavaTla[i].pushImage(0,0,32,6,brown[0]);
+  }
+
   mc.createSprite(32,32);
   mc.setSwapBytes(false);
   mc.pushImage(0,0,32,32,jaz[0]);
@@ -122,6 +128,10 @@ void slika(){
   
   for(int i = 0; i < 5; i++){
     modraTla[i].pushToSprite(&background,ModTile[i]->x,ModTile[i]->y,TFT_WHITE);
+  }
+
+  for(int i = 0; i < 5; i++){
+    rjavaTla[i].pushToSprite(&background,ModTile[i]->x,ModTile[i]->y,TFT_WHITE);
   }
 
   mc.pushToSprite(&background,x,y,TFT_WHITE);
@@ -166,15 +176,26 @@ void premakniModro(){
   }
 }
 
+void genRjava(){
+  int i;
+  for(i = 0; i < 5; i++){
+    if(!RjaTile[i]->up){
+      break;
+    }
+  }
+  
+  RjaTile[i]->x = rand()%103;
+  RjaTile[i]->y = -10;
+}
+
 void mogoceRjava(){
   if(rand()%100 == rand()%100){
     genRjava();
   }
 }
 
-void genRjava(){
-  
-}
+
+
 void checkTile(){
   
   for(int i = 0; i < 5; i++){
@@ -250,7 +271,7 @@ void generateTiles() {
     if (ZelTile[i]->y > 240) {
       if (ModTile[i]->y > 240){  
           upI[i] = false; 
-          mogoceRjava(); 
+          genRjava(); 
         }
       if(upI[i]){
         continue;

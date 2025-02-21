@@ -22,7 +22,8 @@ class RjaviTile{
     public: int y;
     public: bool pada = false;
     public: bool up = false;
-    public: RjaviTile(int x, int  y)
-    this->x = x;
-    this->y = y;
-}
+    public: RjaviTile(int x, int y){
+        this->x = x;
+        this->y = y;
+    }
+};
