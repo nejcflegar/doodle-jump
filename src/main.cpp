@@ -57,6 +57,11 @@ void setup(){
     ModTile[i] = new ModriTile(rand()%103, 999);
   }
   
+  for (int i = 0; i < 5; i++) {
+    RjaTile[i] = new RjaviTile(rand() % 103, 999);
+  }
+  
+
   pinMode(35, INPUT_PULLUP);
   pinMode(0,  INPUT_PULLUP);
 
@@ -109,9 +114,9 @@ void setup(){
 bool yay = false;
 bool mogoceModra(){
   yay = false;
-  int temp = rand()%1000;
+  int temp = rand()%500;
   for(int i = 0; i < score; i++){
-    int temp2 = rand()%1000;
+    int temp2 = rand()%500;
     if(temp2 == temp){
       yay = true;
     }
@@ -131,7 +136,7 @@ void slika(){
   }
 
   for(int i = 0; i < 5; i++){
-    rjavaTla[i].pushToSprite(&background,ModTile[i]->x,ModTile[i]->y,TFT_WHITE);
+    rjavaTla[i].pushToSprite(&background,RjaTile[i]->x,RjaTile[i]->y,TFT_WHITE);
   }
 
   mc.pushToSprite(&background,x,y,TFT_WHITE);
@@ -162,13 +167,11 @@ void premakniModro(){
       if(ModTile[i]->levo){
         if(ModTile[i]->x < 0){
           ModTile[i]->levo = false;
-          Serial.print("false");
         }
         ModTile[i]->x -= 2;
       }else{
         if(ModTile[i]->x > 109){
           ModTile[i]->levo = true;
-          Serial.print("true");
         }
         ModTile[i]->x += 2;
       }
@@ -177,19 +180,19 @@ void premakniModro(){
 }
 
 void genRjava(){
-  int i;
-  for(i = 0; i < 5; i++){
-    if(!RjaTile[i]->up){
+  for(int i = 0; i < 5; i++){
+    if(RjaTile[i]->up){
+    }else{
+      RjaTile[i]->x = rand()%103;
+      RjaTile[i]->y = -35;
+      RjaTile[i]->up = true;
       break;
     }
   }
-  
-  RjaTile[i]->x = rand()%103;
-  RjaTile[i]->y = -10;
 }
 
 void mogoceRjava(){
-  if(rand()%100 == rand()%100){
+  if(rand()%10 == rand()%10){
     genRjava();
   }
 }
@@ -211,15 +214,28 @@ void checkTile(){
       }
     }
   }
+
   for(int i = 0; i < 5; i++){
-    if((-32 < (ModTile[i]->x + 16 - (x + 16))) && ((ModTile[i]->x + 16 - (x + 16)) < 32)){
-      if(-2 < (ModTile[i]->y - (y + 32)) && (ModTile[i]->y - (y + 32) < 4)){
-        if(jumpTime > 30 ){
-          atGround = true;
-          if((prevAtGroundY - y) > 5){
-            score++;
-            prevAtGroundY = y;
+    if(upI[i]){
+      if((-32 < (ModTile[i]->x + 16 - (x + 16))) && ((ModTile[i]->x + 16 - (x + 16)) < 32)){
+        if(-2 < (ModTile[i]->y - (y + 32)) && (ModTile[i]->y - (y + 32) < 4)){
+          if(jumpTime > 30 ){
+            atGround = true;
+            if((prevAtGroundY - y) > 5){
+              score++;
+              prevAtGroundY = y;
+            }
           }
+        }
+      }
+    }
+  }
+
+  for(int i = 0; i < 5; i++){
+    if(RjaTile[i]->up){
+      if((-32 < (RjaTile[i]->x + 16 - (x + 16))) && ((RjaTile[i]->x + 16 - (x + 16)) < 32)){
+        if(-2 < (RjaTile[i]->y - (y + 32)) && (RjaTile[i]->y - (y + 32) < 4)){
+          RjaTile[i]->pada = true;
         }
       }
     }
@@ -267,11 +283,11 @@ void generateTiles() {
     i = 0;
   }
   
-  for (; i < stZelenih; i++) {
+  for (; i < 5; i++) {
     if (ZelTile[i]->y > 240) {
       if (ModTile[i]->y > 240){  
           upI[i] = false; 
-          genRjava(); 
+          mogoceRjava(); 
         }
       if(upI[i]){
         continue;
@@ -310,6 +326,7 @@ void dajDol(){
     for(int i = 0; i < 5; i++){
       ZelTile[i]->y += 3;
       ModTile[i]->y += 3;
+      RjaTile[i]->y +=3;
     }
   }else if((y < 80) && (y > 60)){
     y+=4;
@@ -325,6 +342,20 @@ void dajDol(){
     }
   }
 
+}
+
+void padanjeRjave(){
+  for(int i = 0; i < 5; i++){
+    if(RjaTile[i]->pada && RjaTile[i]->up){
+      rjavaTla[i].pushImage(0,0,32,6,brown[1]);
+      RjaTile[i]->y += 3;
+      if(RjaTile[i]->y > 250){
+        RjaTile[i]->up = false;
+        RjaTile[i]->pada = false;
+        rjavaTla[i].pushImage(0,0,32,6,brown[0]);
+      }
+    }
+  }
 }
 
 void checkForBoost(){
@@ -357,6 +388,7 @@ void loop(){
   
   checkForBoost();
   premakniModro();
+  padanjeRjave();
   generateTiles();
   jump();
   dajDol();
