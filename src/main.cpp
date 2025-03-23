@@ -275,6 +275,22 @@ void jump(){
   }
 }
 
+int poglejTaZadno(){
+  int y = 999;
+  for(int i = 0; i < 5; i++){
+    if(ZelTile[i]->y < y){
+      y = ZelTile[i];
+    }
+  } 
+  for(int i = 0; i < 5; i++){
+    if(ModTile[i]->y < y){
+      y = ModTile[i];
+    }
+  } 
+
+  return y - 50;
+}
+
 void generateTiles() {
   int i;
   if (upI[0] == true) {
@@ -296,20 +312,18 @@ void generateTiles() {
       if (!mogoceModra()) {
         if (!upI[i]) {
           ZelTile[i]->x = (rand() % 103);
-          ZelTile[i]->y = -10;
+          ZelTile[i]->y = poglejTaZadno();
         }
       } else {
         if (!upI[i]) {  
           upI[i] = true;
           ModTile[i]->x = (rand() % 103);
-          ModTile[i]->y = -10;
+          ModTile[i]->y = poglejTaZadno();
         }
       }
     }
   }
 }
-
-
 
 void dajDol(){
   if((y < 114) && (y > 80)){
@@ -358,10 +372,6 @@ void padanjeRjave(){
   }
 }
 
-void checkForBoost(){
-
-}
-
 void smrtLoop(){
   smrtLoop();
 }
@@ -386,7 +396,6 @@ void loop(){
     move(false);
   }
   
-  checkForBoost();
   premakniModro();
   padanjeRjave();
   generateTiles();

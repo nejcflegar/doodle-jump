@@ -16,7 +16,7 @@ class ModriTile{
     }
 
 };
-
+        
 class RjaviTile{
     public: int x;
     public: int y;
