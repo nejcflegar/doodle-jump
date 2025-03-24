@@ -7,25 +7,30 @@
 #include "ZeleniTile.cpp"
 #include "stack.cpp"
 #include "brown.h"
+#include "strelV2.h"
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite zelenaTla[] = { TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
 TFT_eSprite modraTla[] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
 TFT_eSprite rjavaTla[] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
+TFT_eSprite strelSlika[] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
 TFT_eSprite background = TFT_eSprite(&tft);
 TFT_eSprite mc = TFT_eSprite(&tft);
 
-TFT_eSprite Mtla1 = TFT_eSprite(&tft);
 TFT_eSprite check = TFT_eSprite(&tft);
 TFT_eSprite scr = TFT_eSprite(&tft);
 TFT_eSprite backgroundEnd = TFT_eSprite(&tft);
 
 int button_levo = 0;
 int button_desno = 35;
+int button_strel = 12;
+
+boolean stel_debounce = HIGH;
 
 ZeleniTile* ZelTile[5];
 ModriTile* ModTile[5];
 RjaviTile* RjaTile[5];
+Metek* strel[10];
 
 int prevAtGroundY = 9999;
 int score = 0;
@@ -61,11 +66,15 @@ void setup(){
     RjaTile[i] = new RjaviTile(rand() % 103, 999);
   }
   
+  for(int i = 0; i < 10; i++){
+    strel[i] = new Metek(-1119,-1119);
+  }
 
-  pinMode(35, INPUT_PULLUP);
-  pinMode(0,  INPUT_PULLUP);
-
+  pinMode(button_levo, INPUT_PULLUP);
+  pinMode(button_desno,  INPUT_PULLUP);
+  pinMode(button_strel, INPUT_PULLUP);
   
+
 
   tft.setSwapBytes(true);
   tft.init();
@@ -79,10 +88,6 @@ void setup(){
   backgroundEnd.setSwapBytes(true);
   backgroundEnd.pushImage(0,0,135,240,bg5);
   backgroundEnd.pushSprite(0,0);
-
-  Mtla1.createSprite(32,6);
-  Mtla1.setSwapBytes(false);
-  Mtla1.pushImage(0,0,32,6,tile[0]);
 
   for(int i = 0; i < 5; i++){
     zelenaTla[i].createSprite(32,6);
@@ -100,6 +105,12 @@ void setup(){
     rjavaTla[i].createSprite(32,6);
     rjavaTla[i].setSwapBytes(false);
     rjavaTla[i].pushImage(0,0,32,6,brown[0]);
+  }
+
+  for(int i = 0; i < 10; i++){
+    strelSlika[i].createSprite(8,8);
+    strelSlika[i].setSwapBytes(false);
+    strelSlika[i].pushImage(0,0,8,8,strelV2[0]);
   }
 
   mc.createSprite(32,32);
@@ -137,6 +148,10 @@ void slika(){
 
   for(int i = 0; i < 5; i++){
     rjavaTla[i].pushToSprite(&background,RjaTile[i]->x,RjaTile[i]->y,TFT_WHITE);
+  }
+
+  for(int i = 0; i < 10; i++){
+    strelSlika[i].pushToSprite(&background,strel[i]->x,strel[i]->y,TFT_WHITE);
   }
 
   mc.pushToSprite(&background,x,y,TFT_WHITE);
@@ -279,12 +294,12 @@ int poglejTaZadno(){
   int y = 999;
   for(int i = 0; i < 5; i++){
     if(ZelTile[i]->y < y){
-      y = ZelTile[i];
+      y = ZelTile[i]->y;
     }
   } 
   for(int i = 0; i < 5; i++){
     if(ModTile[i]->y < y){
-      y = ModTile[i];
+      y = ModTile[i]->y;
     }
   } 
 
@@ -292,14 +307,8 @@ int poglejTaZadno(){
 }
 
 void generateTiles() {
-  int i;
-  if (upI[0] == true) {
-    i = 1;
-  } else {
-    i = 0;
-  }
-  
-  for (; i < 5; i++) {
+
+  for (int i = 0; i < 5; i++) {
     if (ZelTile[i]->y > 240) {
       if (ModTile[i]->y > 240){  
           upI[i] = false; 
@@ -342,17 +351,34 @@ void dajDol(){
       ModTile[i]->y += 3;
       RjaTile[i]->y +=3;
     }
+    for(int i = 0; i < 10; i++){
+      if(strel[i]->uporabljen){
+        strel[i]->y += 3;
+      }
+    }
   }else if((y < 80) && (y > 60)){
     y+=4;
     for(int i = 0; i < 5; i++){
       ZelTile[i]->y+=4;
       ModTile[i]->y += 4;
+      RjaTile[i]->y +=4;
+    }
+    for(int i = 0; i < 10; i++){
+      if(strel[i]->uporabljen){
+        strel[i]->y += 4;
+      }
     }
   }else if(y < 60){
     y+=6;
     for(int i = 0; i < 5; i++){
       ZelTile[i]->y+=6;
       ModTile[i]->y += 6;
+      RjaTile[i]->y +=6;
+      for(int i = 0; i < 10; i++){
+        if(strel[i]->uporabljen){
+          strel[i]->y += 6;
+        }
+      }
     }
   }
 
@@ -386,6 +412,30 @@ void smrt(){
   }
 }
 
+void streljacina(){
+  mc.pushImage(0,0,32,32,jaz[2]);
+  mc.pushToSprite(&background,x,y,TFT_WHITE);
+  for(int i = 0; i < 10; i++){
+    if(!strel[i]->uporabljen){
+      strel[i]->x = x+12;
+      strel[i]->y = y-12;
+      strel[i]->uporabljen = true;
+      break;
+    }
+  }
+}
+
+void premikanjeStrela(){
+  for(int i = 0; i < 10; i++){
+    if(strel[i]->uporabljen){
+      strel[i]->y -=6;
+      if(strel[i]->y < -10){
+        strel[i]->uporabljen = false;
+      }
+    }
+  }
+}
+
 void loop(){
   jumpTime++;
 
@@ -395,7 +445,17 @@ void loop(){
   if(digitalRead(button_levo) == 0){
     move(false);
   }
-  
+  if (digitalRead(button_strel) == LOW) {
+    if (stel_debounce == HIGH) {
+      streljacina();
+    }
+    stel_debounce = LOW;
+  } else {
+    stel_debounce = HIGH; 
+  }
+
+
+  premikanjeStrela();
   premakniModro();
   padanjeRjave();
   generateTiles();

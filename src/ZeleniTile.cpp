@@ -27,3 +27,13 @@ class RjaviTile{
         this->y = y;
     }
 };
+
+class Metek{
+    public: int x;
+    public: int y;
+    public: bool uporabljen = false;
+    public: Metek(int x, int y){
+        this->x = x;
+        this->y = y;
+    }
+};
