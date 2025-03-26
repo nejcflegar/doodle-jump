@@ -8,6 +8,7 @@
 #include "stack.cpp"
 #include "brown.h"
 #include "strelV2.h"
+#include "enemies.h"
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite zelenaTla[] = { TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)};
@@ -20,6 +21,10 @@ TFT_eSprite mc = TFT_eSprite(&tft);
 TFT_eSprite check = TFT_eSprite(&tft);
 TFT_eSprite scr = TFT_eSprite(&tft);
 TFT_eSprite backgroundEnd = TFT_eSprite(&tft);
+
+TFT_eSprite nas_violcni = TFT_eSprite(&tft);
+TFT_eSprite nas_modri = TFT_eSprite(&tft);
+TFT_eSprite nas_pinki = TFT_eSprite(&tft);
 
 int button_levo = 0;
 int button_desno = 35;
@@ -44,7 +49,7 @@ int stZelenih = 5;
 int stModrih = 0;
 stack sklad;
 bool upI[5] = {false, false, false, false, false};
-
+long cas = 0;
 
 bool CoinFlip() {
   return rand() % 2 == 1;
@@ -79,15 +84,33 @@ void setup(){
   tft.setSwapBytes(true);
   tft.init();
 
+/////////////           OZADJE            ///////////////////
+
   background.createSprite(135,240);
   background.setSwapBytes(true);
   background.pushImage(0,0,135,240,bg4);
   background.pushSprite(0,0);
 
+
+/////////////           NASPROTNIKI       //////////////////
+  nas_violcni.createSprite(32,32);
+  nas_violcni.setSwapBytes(false);
+  nas_violcni.pushImage(0,0,32,32,enemies[0]);
+  nas_modri.createSprite(32,32);
+  nas_modri.setSwapBytes(false);
+  nas_modri.pushImage(0,0,32,32,enemies[2]);
+  nas_pinki.createSprite(32,32);
+  nas_pinki.setSwapBytes(false);
+  nas_pinki.pushImage(0,0,32,32,enemies[4]);
+
+/////////////           KONEC OZADJA    ///////////////////
+
   backgroundEnd.createSprite(135,240);
   backgroundEnd.setSwapBytes(true);
   backgroundEnd.pushImage(0,0,135,240,bg5);
   backgroundEnd.pushSprite(0,0);
+
+/////////////           TLA             //////////////////
 
   for(int i = 0; i < 5; i++){
     zelenaTla[i].createSprite(32,6);
@@ -107,11 +130,15 @@ void setup(){
     rjavaTla[i].pushImage(0,0,32,6,brown[0]);
   }
 
+/////////////           METEK           ////////////////////
+
   for(int i = 0; i < 10; i++){
     strelSlika[i].createSprite(8,8);
     strelSlika[i].setSwapBytes(false);
     strelSlika[i].pushImage(0,0,8,8,strelV2[0]);
   }
+
+/////////////           DOODLER         ////////////////////
 
   mc.createSprite(32,32);
   mc.setSwapBytes(false);
@@ -153,6 +180,10 @@ void slika(){
   for(int i = 0; i < 10; i++){
     strelSlika[i].pushToSprite(&background,strel[i]->x,strel[i]->y,TFT_WHITE);
   }
+
+  nas_violcni.pushToSprite(&background,0,0,TFT_WHITE);
+  nas_modri.pushToSprite(&background,0,32,TFT_WHITE);
+  nas_pinki.pushToSprite(&background,32,0,TFT_WHITE);
 
   mc.pushToSprite(&background,x,y,TFT_WHITE);
   background.pushSprite(0,0);
@@ -426,8 +457,22 @@ void streljacina(){
 }
 
 void premikanjeStrela(){
+  cas++;
+  boolean spremeni = false;
+
+  if(cas > 10){
+    spremeni = true;
+    cas = 0;
+  }
   for(int i = 0; i < 10; i++){
     if(strel[i]->uporabljen){
+      if(spremeni){
+        strel[i]->stSlike++;
+        if(strel[i]->stSlike == 4){
+          strel[i]->stSlike = 0;
+        }
+        strelSlika[i].pushImage(0,0,8,8,strelV2[strel[i]->stSlike]);
+      }
       strel[i]->y -=6;
       if(strel[i]->y < -10){
         strel[i]->uporabljen = false;

@@ -31,6 +31,7 @@ class RjaviTile{
 class Metek{
     public: int x;
     public: int y;
+    public: int stSlike = 0; 
     public: bool uporabljen = false;
     public: Metek(int x, int y){
         this->x = x;
