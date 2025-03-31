@@ -509,3 +509,5 @@ void loop(){
   smrt();
   slika();
 }
+
+//////test/////
