@@ -35,6 +35,7 @@ boolean stel_debounce = HIGH;
 ZeleniTile* ZelTile[5];
 ModriTile* ModTile[5];
 RjaviTile* RjaTile[5];
+Posast* posast[3];
 Metek* strel[10];
 
 int prevAtGroundY = 9999;
@@ -72,7 +73,11 @@ void setup(){
   }
   
   for(int i = 0; i < 10; i++){
-    strel[i] = new Metek(-1119,-1119);
+    strel[i] = new Metek(1119,1119);
+  }
+
+  for(int i = 0; i < 3; i++){
+    posast[i] = new Posast(2222,1222);
   }
 
   pinMode(button_levo, INPUT_PULLUP);
@@ -181,22 +186,23 @@ void slika(){
     strelSlika[i].pushToSprite(&background,strel[i]->x,strel[i]->y,TFT_WHITE);
   }
 
-  nas_violcni.pushToSprite(&background,0,0,TFT_WHITE);
-  nas_modri.pushToSprite(&background,0,32,TFT_WHITE);
-  nas_pinki.pushToSprite(&background,32,0,TFT_WHITE);
 
-  mc.pushToSprite(&background,x,y,TFT_WHITE);
-  background.pushSprite(0,0);
-}
+  nas_violcni.pushToSprite(&background,posast[0]->x,posast[0]->y,TFT_WHITE);
+  nas_modri.pushToSprite(&background,posast[1]->x,posast[1]->y,TFT_WHITE);
+  nas_pinki.pushToSprite(&background,posast[2]->x,posast[2]->y,TFT_WHITE); 
 
-void move(boolean a){
-  if(a){
-    mc.pushImage(0,0,32,32,jaz[0]);
-    mc.pushToSprite(&background,x,y,TFT_WHITE);
-    x +=4;
-    if(x > 125){
-      x = -20;
-    }
+  mc.pushToSprite(&background,x,y,TFT_WHITE);   
+  background.pushSprite(0,0);   
+}   
+   
+void move(boolean a){   
+  if(a){   
+    mc.pushImage(0,0,32,32,jaz[0]);   
+    mc.pushToSprite(&background,x,y,TFT_WHITE);   
+    x +=4;   
+    if(x > 125){   
+      x = -20;   
+    }   
   }else{
     mc.pushImage(0,0,32,32,jaz[1]);
     mc.pushToSprite(&background,x,y,TFT_WHITE);
@@ -337,6 +343,26 @@ int poglejTaZadno(){
   return y - 50;
 }
 
+void generirajPosast(int ZelI){
+  int index = 0;
+  if(!posast[index]->uporabljen){
+    posast[index]->uporabljen = true;
+    posast[index]->x = ZelTile[ZelI]->x;
+    posast[index]->y = ZelTile[ZelI]->y - 40;
+  }
+}
+
+void mogocePosast(int ZelI){
+  
+  int temp = rand()%50;
+  for(int i = 0; i < score; i++){
+    int temp2 = rand()%50;
+    if(temp2 == temp){
+      generirajPosast(ZelI);
+    }
+  }
+}
+
 void generateTiles() {
 
   for (int i = 0; i < 5; i++) {
@@ -353,6 +379,7 @@ void generateTiles() {
         if (!upI[i]) {
           ZelTile[i]->x = (rand() % 103);
           ZelTile[i]->y = poglejTaZadno();
+          mogocePosast(i);
         }
       } else {
         if (!upI[i]) {  
@@ -382,6 +409,9 @@ void dajDol(){
       ModTile[i]->y += 3;
       RjaTile[i]->y +=3;
     }
+    for(int i = 0; i < 3; i++){
+      posast[i]->y+=3;
+    }
     for(int i = 0; i < 10; i++){
       if(strel[i]->uporabljen){
         strel[i]->y += 3;
@@ -394,6 +424,9 @@ void dajDol(){
       ModTile[i]->y += 4;
       RjaTile[i]->y +=4;
     }
+    for(int i = 0; i < 3; i++){
+      posast[i]->y+=4;
+    }
     for(int i = 0; i < 10; i++){
       if(strel[i]->uporabljen){
         strel[i]->y += 4;
@@ -404,12 +437,15 @@ void dajDol(){
     for(int i = 0; i < 5; i++){
       ZelTile[i]->y+=6;
       ModTile[i]->y += 6;
-      RjaTile[i]->y +=6;
-      for(int i = 0; i < 10; i++){
-        if(strel[i]->uporabljen){
-          strel[i]->y += 6;
-        }
+      RjaTile[i]->y +=6; 
+    }
+    for(int i = 0; i < 10; i++){
+      if(strel[i]->uporabljen){
+        strel[i]->y += 6;
       }
+    }
+    for(int i = 0; i < 3; i++){
+      posast[i]->y+=3;
     }
   }
 
@@ -481,6 +517,41 @@ void premikanjeStrela(){
   }
 }
 
+void checkPosastTla(){
+  for(int i = 0; i < 3; i++){
+    if((posast[i]->uporabljen) && (posast[i]->y > 273)){
+      posast[i]->uporabljen = false;
+    }
+  }
+}
+
+void premikPosasti(){
+  if(posast[0]->uporabljen){
+    if(posast[0]->levo){
+      if(posast[0]->premik < 25){
+        posast[0]->x--;
+        posast[0]->premik++;
+        Serial.println("tukaj");
+      }else{
+        posast[0]->levo = false;
+        nas_violcni.pushImage(0,0,32,32,enemies[0]);
+        Serial.println("kle");
+      }
+    }else{
+      if(posast[0]->premik > 5){
+        posast[0]->x++;
+        posast[0]->premik--;
+        Serial.println("semkaj");
+      }else{
+        posast[0]->levo = true;
+        nas_violcni.pushImage(0,0,32,32,enemies[1]);
+        Serial.println("cuh");
+      }
+    }
+  }
+}
+
+
 void loop(){
   jumpTime++;
 
@@ -499,7 +570,8 @@ void loop(){
     stel_debounce = HIGH; 
   }
 
-
+  premikPosasti();
+  checkPosastTla();
   premikanjeStrela();
   premakniModro();
   padanjeRjave();
