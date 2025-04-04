@@ -581,5 +581,4 @@ void loop(){
   smrt();
   slika();
 }
-
-//////test/////
+///Prosim delaj :D!
