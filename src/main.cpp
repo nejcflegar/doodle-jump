@@ -344,7 +344,7 @@ int poglejTaZadno(){
 }
 
 void generirajPosast(int ZelI){
-  int index = 0;
+  int index = 1;
   if(!posast[index]->uporabljen){
     posast[index]->uporabljen = true;
     posast[index]->x = ZelTile[ZelI]->x;
@@ -531,21 +531,42 @@ void premikPosasti(){
       if(posast[0]->premik < 25){
         posast[0]->x--;
         posast[0]->premik++;
-        Serial.println("tukaj");
       }else{
         posast[0]->levo = false;
         nas_violcni.pushImage(0,0,32,32,enemies[0]);
-        Serial.println("kle");
       }
     }else{
       if(posast[0]->premik > 5){
         posast[0]->x++;
         posast[0]->premik--;
-        Serial.println("semkaj");
       }else{
         posast[0]->levo = true;
         nas_violcni.pushImage(0,0,32,32,enemies[1]);
-        Serial.println("cuh");
+      }
+    }
+  }
+
+  if (posast[1]->uporabljen){
+    if(posast[1]->premik < 30){
+      posast[1]->premik++;
+    }else{
+      posast[1]->premik--;
+    }
+    if (posast[1]->levo) {
+      Serial.println(posast[1]->levo);
+      Serial.println(posast[1]->x);
+      if (posast[1]->x > 0) { 
+        posast[1]->x -= 2;
+      }else{
+        posast[1]->levo = false;
+        nas_modri.pushImage(0, 0, 32, 32, enemies[3]);
+      }
+    }else{
+      if (posast[1]->x < 102) { 
+        posast[1]->x += 2;
+      }else{
+        posast[1]->levo = true;
+        nas_modri.pushImage(0, 0, 32, 32, enemies[2]);
       }
     }
   }
