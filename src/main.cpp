@@ -4,7 +4,7 @@
 #include "mc.h"
 #include "tile.h"
 #include "bg5.h"
-#include "ZeleniTile.cpp"
+#include "Objekti.cpp"
 #include "stack.cpp"
 #include "brown.h"
 #include "strelV2.h"
@@ -344,7 +344,7 @@ int poglejTaZadno(){
 }
 
 void generirajPosast(int ZelI){
-  int index = 0;
+  int index = 1;
   if(!posast[index]->uporabljen){
     posast[index]->uporabljen = true;
     posast[index]->x = ZelTile[ZelI]->x;
@@ -379,7 +379,7 @@ void generateTiles() {
         if (!upI[i]) {
           ZelTile[i]->x = (rand() % 103);
           ZelTile[i]->y = poglejTaZadno();
-          mogocePosast(i);
+          //mogocePosast(i);
         }
       } else {
         if (!upI[i]) {  
@@ -531,21 +531,51 @@ void premikPosasti(){
       if(posast[0]->premik < 25){
         posast[0]->x--;
         posast[0]->premik++;
-        Serial.println("tukaj");
       }else{
         posast[0]->levo = false;
         nas_violcni.pushImage(0,0,32,32,enemies[0]);
-        Serial.println("kle");
       }
     }else{
       if(posast[0]->premik > 5){
         posast[0]->x++;
         posast[0]->premik--;
-        Serial.println("semkaj");
       }else{
         posast[0]->levo = true;
         nas_violcni.pushImage(0,0,32,32,enemies[1]);
-        Serial.println("cuh");
+      }
+    }
+  }
+
+  if(posast[1]->uporabljen){
+    if(posast[1]->levo){
+      if(posast[1]->x > 0){
+        posast[1]->x--;
+      }else{
+        posast[1]->levo = false;
+        nas_modri.pushImage(0,0,32,32,enemies[2]);
+      }
+    }else{
+      if(posast[1]->x < 102){
+        posast[1]->x++;
+      }else{
+        posast[1]->levo = true;
+        nas_modri.pushImage(0,0,32,32,enemies[3]);
+      }
+    }
+
+    if (posast[1]->gorDol){
+      if(posast[1]->premik < 20){
+        posast[1]->premik++;
+        posast[1]->y++;
+      }else{
+        posast[1]->gorDol = false;
+      }
+    }else{
+      if(posast[1]->premik < 0){
+        posast[1]->premik--;
+        posast[1]->y--;
+      }else{
+        posast[1]->gorDol = true;
       }
     }
   }
@@ -557,13 +587,16 @@ void loop(){
 
   if(digitalRead(button_desno) == 0){
     move(true);
+    Serial.println("bigger");
   }
   if(digitalRead(button_levo) == 0){
     move(false);
+    Serial.println("nigger");
   }
   if (digitalRead(button_strel) == LOW) {
     if (stel_debounce == HIGH) {
       streljacina();
+      
     }
     stel_debounce = LOW;
   } else {
