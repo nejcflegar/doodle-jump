@@ -45,11 +45,13 @@ class Posast{
     public: int premik;
     public: bool levo;
     public: bool uporabljen;
+    public: bool gorDol;
     public: Posast(int x, int y){
         this->x = x;
         this->y = y;
         this->uporabljen = false;
         this->levo = true;
         this->premik = 10;
+        this->gorDol = true;
     }
 };

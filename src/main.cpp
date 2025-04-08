@@ -4,7 +4,7 @@
 #include "mc.h"
 #include "tile.h"
 #include "bg5.h"
-#include "ZeleniTile.cpp"
+#include "Objekti.cpp"
 #include "stack.cpp"
 #include "brown.h"
 #include "strelV2.h"
@@ -379,7 +379,7 @@ void generateTiles() {
         if (!upI[i]) {
           ZelTile[i]->x = (rand() % 103);
           ZelTile[i]->y = poglejTaZadno();
-          mogocePosast(i);
+          //mogocePosast(i);
         }
       } else {
         if (!upI[i]) {  
@@ -546,6 +546,7 @@ void premikPosasti(){
     }
   }
 
+<<<<<<< HEAD
   if (posast[1]->uporabljen){
     if(posast[1]->premik < 30){
       posast[1]->premik++;
@@ -567,6 +568,38 @@ void premikPosasti(){
       }else{
         posast[1]->levo = true;
         nas_modri.pushImage(0, 0, 32, 32, enemies[2]);
+=======
+  if(posast[1]->uporabljen){
+    if(posast[1]->levo){
+      if(posast[1]->x > 0){
+        posast[1]->x--;
+      }else{
+        posast[1]->levo = false;
+        nas_modri.pushImage(0,0,32,32,enemies[2]);
+      }
+    }else{
+      if(posast[1]->x < 102){
+        posast[1]->x++;
+      }else{
+        posast[1]->levo = true;
+        nas_modri.pushImage(0,0,32,32,enemies[3]);
+      }
+    }
+
+    if (posast[1]->gorDol){
+      if(posast[1]->premik < 20){
+        posast[1]->premik++;
+        posast[1]->y++;
+      }else{
+        posast[1]->gorDol = false;
+      }
+    }else{
+      if(posast[1]->premik < 0){
+        posast[1]->premik--;
+        posast[1]->y--;
+      }else{
+        posast[1]->gorDol = true;
+>>>>>>> af0811394d842fa268edd01d975c5912a6c3b4cd
       }
     }
   }
@@ -578,13 +611,16 @@ void loop(){
 
   if(digitalRead(button_desno) == 0){
     move(true);
+    Serial.println("bigger");
   }
   if(digitalRead(button_levo) == 0){
     move(false);
+    Serial.println("nigger");
   }
   if (digitalRead(button_strel) == LOW) {
     if (stel_debounce == HIGH) {
       streljacina();
+      
     }
     stel_debounce = LOW;
   } else {
@@ -602,5 +638,4 @@ void loop(){
   smrt();
   slika();
 }
-
-//////test/////
+///Prosim delaj :D!
