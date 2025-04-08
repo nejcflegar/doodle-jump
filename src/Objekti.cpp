@@ -51,7 +51,7 @@ class Posast{
         this->y = y;
         this->uporabljen = false;
         this->levo = true;
-        this->premik = 10;
+        this->premik = 7;
         this->gorDol = true;
     }
 };

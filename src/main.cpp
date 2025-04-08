@@ -46,9 +46,9 @@ int jumpTime = 0;
 int atGroundY;
 boolean atGround = true;
 boolean atTileGround = false;
+bool pada = false;
 int stZelenih = 5;
 int stModrih = 0;
-stack sklad;
 bool upI[5] = {false, false, false, false, false};
 long cas = 0;
 
@@ -287,7 +287,9 @@ void checkTile(){
     if(RjaTile[i]->up){
       if((-32 < (RjaTile[i]->x + 16 - (x + 16))) && ((RjaTile[i]->x + 16 - (x + 16)) < 32)){
         if(-2 < (RjaTile[i]->y - (y + 32)) && (RjaTile[i]->y - (y + 32) < 4)){
-          RjaTile[i]->pada = true;
+          if(pada == true){
+            RjaTile[i]->pada = true;
+          }
         }
       }
     }
@@ -300,7 +302,7 @@ void jump(){
     jumpTime = 0;
   }else{
     if(jumpTime < 30){
-
+      pada = false;
       if(jumpTime <10){
         y -= 4;
       }else if(jumpTime <25){
@@ -310,7 +312,7 @@ void jump(){
       }
       
     }else{
-
+      pada = true;
       if(jumpTime <35){
         y += 1;
       }else if(jumpTime <50){
@@ -344,7 +346,7 @@ int poglejTaZadno(){
 }
 
 void generirajPosast(int ZelI){
-  int index = 1;
+  int index = rand()%2;
   if(!posast[index]->uporabljen){
     posast[index]->uporabljen = true;
     posast[index]->x = ZelTile[ZelI]->x;
@@ -379,7 +381,7 @@ void generateTiles() {
         if (!upI[i]) {
           ZelTile[i]->x = (rand() % 103);
           ZelTile[i]->y = poglejTaZadno();
-          //mogocePosast(i);
+          mogocePosast(i);
         }
       } else {
         if (!upI[i]) {  
@@ -455,7 +457,7 @@ void padanjeRjave(){
   for(int i = 0; i < 5; i++){
     if(RjaTile[i]->pada && RjaTile[i]->up){
       rjavaTla[i].pushImage(0,0,32,6,brown[1]);
-      RjaTile[i]->y += 3;
+      RjaTile[i]->y += 5;
       if(RjaTile[i]->y > 250){
         RjaTile[i]->up = false;
         RjaTile[i]->pada = false;
@@ -528,25 +530,26 @@ void checkPosastTla(){
 void premikPosasti(){
   if(posast[0]->uporabljen){
     if(posast[0]->levo){
-      if(posast[0]->premik < 25){
+      if(posast[0]->premik < 12){
         posast[0]->x--;
         posast[0]->premik++;
       }else{
         posast[0]->levo = false;
         nas_violcni.pushImage(0,0,32,32,enemies[0]);
+        posast[0]->premik = 0;
       }
     }else{
-      if(posast[0]->premik > 5){
+      if(posast[0]->premik < 12){
         posast[0]->x++;
-        posast[0]->premik--;
+        posast[0]->premik++;
       }else{
         posast[0]->levo = true;
+        posast[0]->premik = 0;
         nas_violcni.pushImage(0,0,32,32,enemies[1]);
       }
     }
   }
 
-<<<<<<< HEAD
   if (posast[1]->uporabljen){
     if(posast[1]->premik < 30){
       posast[1]->premik++;
@@ -554,8 +557,6 @@ void premikPosasti(){
       posast[1]->premik--;
     }
     if (posast[1]->levo) {
-      Serial.println(posast[1]->levo);
-      Serial.println(posast[1]->x);
       if (posast[1]->x > 0) { 
         posast[1]->x -= 2;
       }else{
@@ -568,54 +569,38 @@ void premikPosasti(){
       }else{
         posast[1]->levo = true;
         nas_modri.pushImage(0, 0, 32, 32, enemies[2]);
-=======
-  if(posast[1]->uporabljen){
-    if(posast[1]->levo){
-      if(posast[1]->x > 0){
-        posast[1]->x--;
-      }else{
-        posast[1]->levo = false;
-        nas_modri.pushImage(0,0,32,32,enemies[2]);
-      }
-    }else{
-      if(posast[1]->x < 102){
-        posast[1]->x++;
-      }else{
-        posast[1]->levo = true;
-        nas_modri.pushImage(0,0,32,32,enemies[3]);
-      }
+      }    
     }
 
     if (posast[1]->gorDol){
-      if(posast[1]->premik < 20){
+      Serial.println(posast[1]->premik);
+      if(posast[1]->premik < 25){
         posast[1]->premik++;
         posast[1]->y++;
       }else{
         posast[1]->gorDol = false;
+        posast[1]->premik = 0;
       }
     }else{
-      if(posast[1]->premik < 0){
-        posast[1]->premik--;
+      if(posast[1]->premik < 25){
+        posast[1]->premik++;
         posast[1]->y--;
       }else{
         posast[1]->gorDol = true;
->>>>>>> af0811394d842fa268edd01d975c5912a6c3b4cd
+        posast[1]->premik = 0;
       }
     }
   }
 }
-
 
 void loop(){
   jumpTime++;
 
   if(digitalRead(button_desno) == 0){
     move(true);
-    Serial.println("bigger");
   }
   if(digitalRead(button_levo) == 0){
     move(false);
-    Serial.println("nigger");
   }
   if (digitalRead(button_strel) == LOW) {
     if (stel_debounce == HIGH) {
