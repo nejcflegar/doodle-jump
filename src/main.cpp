@@ -186,10 +186,15 @@ void slika(){
     strelSlika[i].pushToSprite(&background,strel[i]->x,strel[i]->y,TFT_WHITE);
   }
 
-
-  nas_violcni.pushToSprite(&background,posast[0]->x,posast[0]->y,TFT_WHITE);
-  nas_modri.pushToSprite(&background,posast[1]->x,posast[1]->y,TFT_WHITE);
-  nas_pinki.pushToSprite(&background,posast[2]->x,posast[2]->y,TFT_WHITE); 
+  if(posast[0]->uporabljen){
+    nas_violcni.pushToSprite(&background,posast[0]->x,posast[0]->y,TFT_WHITE);
+  }
+  if(posast[1]->uporabljen){
+    nas_modri.pushToSprite(&background,posast[1]->x,posast[1]->y,TFT_WHITE);
+  }
+  if(posast[2]->uporabljen){
+    nas_pinki.pushToSprite(&background,posast[2]->x,posast[2]->y,TFT_WHITE); 
+  }
 
   mc.pushToSprite(&background,x,y,TFT_WHITE);   
   background.pushSprite(0,0);   
@@ -346,7 +351,7 @@ int poglejTaZadno(){
 }
 
 void generirajPosast(int ZelI){
-  int index = rand()%2;
+  int index = rand()%3;
   if(!posast[index]->uporabljen){
     posast[index]->uporabljen = true;
     posast[index]->x = ZelTile[ZelI]->x;
@@ -356,7 +361,7 @@ void generirajPosast(int ZelI){
 
 void mogocePosast(int ZelI){
   
-  int temp = rand()%50;
+  int temp = rand()%250;
   for(int i = 0; i < score; i++){
     int temp2 = rand()%50;
     if(temp2 == temp){
@@ -472,13 +477,11 @@ void smrtLoop(){
 }
 
 void smrt(){
-  if((y == 208) && (score != 0)){
-    scr.fillSprite(TFT_WHITE);
-    scr.drawString(String(score),0,0);
-    scr.pushToSprite(&backgroundEnd,85,155,TFT_WHITE);
-    backgroundEnd.pushSprite(0,0);
-    smrtLoop();
-  }
+  scr.fillSprite(TFT_WHITE);
+  scr.drawString(String(score),0,0);
+  scr.pushToSprite(&backgroundEnd,85,155,TFT_WHITE);
+  backgroundEnd.pushSprite(0,0);
+  smrtLoop();
 }
 
 void streljacina(){
@@ -573,7 +576,6 @@ void premikPosasti(){
     }
 
     if (posast[1]->gorDol){
-      Serial.println(posast[1]->premik);
       if(posast[1]->premik < 25){
         posast[1]->premik++;
         posast[1]->y++;
@@ -593,6 +595,42 @@ void premikPosasti(){
   }
 }
 
+void zadetekJej(int i){
+  posast[i]->uporabljen = false;
+}
+
+
+void checkPosastSmrt(){
+  for(int i = 0; i < 3; i++){
+    if(posast[i]->uporabljen){
+      for(int j = 0; j < 10; j++){
+        if(strel[j]->uporabljen){
+          if((strel[j]->y - posast[i]->y > 2 && strel[j]->y - posast[i]->y < 30) &&
+             (strel[j]->x - posast[i]->x > 2 && strel[j]->x - posast[i]->x < 30)){
+            zadetekJej(i);
+          }
+        }
+      }
+    }
+  }
+}
+
+void checkSmrt(){
+  if((y == 208) && (score != 0)){
+    smrt();
+  }else{
+    for(int i = 0; i < 3; i++){
+      if(posast[i]->uporabljen){
+        if((y - posast[i]->y > -20 && y - posast[i]->y < 20) &&
+        (x - posast[i]->x > -20 && x - posast[i]->x < 20)){
+          Serial.println("hey");
+          smrt();  
+        }
+      }
+    }
+  }
+}
+
 void loop(){
   jumpTime++;
 
@@ -605,13 +643,14 @@ void loop(){
   if (digitalRead(button_strel) == LOW) {
     if (stel_debounce == HIGH) {
       streljacina();
-      
     }
     stel_debounce = LOW;
   } else {
     stel_debounce = HIGH; 
   }
 
+  checkSmrt();
+  checkPosastSmrt();
   premikPosasti();
   checkPosastTla();
   premikanjeStrela();
@@ -620,7 +659,6 @@ void loop(){
   generateTiles();
   jump();
   dajDol();
-  smrt();
   slika();
 }
 ///Prosim delaj :D!
